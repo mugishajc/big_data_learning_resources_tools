@@ -1,0 +1,13 @@
+product_id,name,category,unit_price
+1,Rice 5kg,Food,9.5
+2,Cooking oil 1L,Food,3.2
+3,Milk 1L,Food,1.1
+4,Sugar 1kg,Food,1.4
+5,Phone charger,Electronics,7.0
+6,Earphones,Electronics,12.0
+7,Solar lamp,Electronics,25.0
+8,Notebook,Stationery,0.8
+9,Pen (box of 10),Stationery,2.5
+10,Soap bar,Household,0.6
+11,Detergent 1kg,Household,2.9
+12,Bucket 10L,Household,4.5
