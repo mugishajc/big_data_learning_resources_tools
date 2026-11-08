@@ -6,3 +6,4 @@ labs/04-pig/out/
 spark-warehouse/
 metastore_db/
 derby.log
+cat-past-papers/source/original scan (all papers).pdf

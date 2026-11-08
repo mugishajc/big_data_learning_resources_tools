@@ -47,4 +47,16 @@ for md in answers/*.md; do
     --print-to-pdf="past-papers/by-topic/$name.pdf" "file://$T/$name.html" 2>/dev/null
   rm -rf "$T"
 done
+# 4. One PDF per past-paper answers file
+for md in cat-past-papers/answers/*.md; do
+  [ -e "$md" ] || continue
+  name=$(basename "$md" .md)
+  T=$(mktemp -d)
+  pandoc "$md" --from gfm --to html5 --standalone --metadata title="$name" \
+    -c "$PWD/scripts/pdf.css" -o "$T/$name.html"
+  "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
+    --print-to-pdf="cat-past-papers/answers/$name.pdf" "file://$T/$name.html" 2>/dev/null
+  rm -rf "$T"
+done
+
 echo "Built cheatsheet/big-data-cheatsheet.pdf past-papers/past-papers-and-answers.pdf and past-papers/by-topic/*.pdf"

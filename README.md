@@ -7,9 +7,10 @@ Shared by students, for students. Corrections and additions are welcome.
 ## Pick your path
 
 **Revising for a CAT or exam (1 to 3 days left)**
-1. Read the [cheat sheet](cheatsheet/big-data-cheatsheet.pdf) (3 pages, all four days).
-2. Work through the [past papers and answers PDF](past-papers/past-papers-and-answers.pdf), or the same answers per day in [`answers/`](answers).
-3. Finish with [the 40 most-asked questions](answers/most-asked-questions.md), and cover the answer before you read it.
+1. Do the real past papers: [CAT, July 2026](<cat-past-papers/CAT past paper July 2026 (questions and answers).pdf>) and [final exams](<cat-past-papers/Final exam past papers (questions and answers).pdf>). Each PDF has the question paper first, then short model answers.
+2. Read the [cheat sheet](cheatsheet/big-data-cheatsheet.pdf) (3 pages, all four days).
+3. Work through the [review questions and answers PDF](past-papers/past-papers-and-answers.pdf), or the same answers per day in [`answers/`](answers).
+4. Finish with [the 40 most-asked questions](answers/most-asked-questions.md), and cover the answer before you read it.
 
 **Learning the course properly (a week or more)**
 1. One day at a time: slides first, then the matching answers file, then the lab.
@@ -22,6 +23,10 @@ Go straight to [RESOURCES.md](RESOURCES.md) and [labs/01-spark](labs/01-spark). 
 ## What is in here
 
 ```
+cat-past-papers/               Real past papers with short model answers
+  CAT past paper July 2026 (questions and answers).pdf
+  Final exam past papers (questions and answers).pdf   July 2026 and October 2025
+  answers/                     The same answers in Markdown
 answers/                       Answers in Markdown, readable on GitHub
   day1-foundations.md          5 V's, CAP, ACID vs BASE, partitioning, Lambda vs Kappa (16 Q)
   day2-hadoop-mapreduce.md     HDFS, YARN, MapReduce review questions (15 Q)
