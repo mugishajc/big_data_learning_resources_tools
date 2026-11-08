@@ -35,4 +35,16 @@ pandoc "$TMP/cover.md" \
 "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
   --print-to-pdf=past-papers/past-papers-and-answers.pdf "file://$TMP/past-papers.html" 2>/dev/null
 rm -rf "$TMP"
-echo "Built cheatsheet/big-data-cheatsheet.pdf and past-papers/past-papers-and-answers.pdf"
+
+# 3. One PDF per answers file
+mkdir -p past-papers/by-topic
+for md in answers/*.md; do
+  name=$(basename "$md" .md)
+  T=$(mktemp -d)
+  pandoc "$md" --from gfm --to html5 --standalone --metadata title="$name" \
+    -c "$PWD/scripts/pdf.css" -o "$T/$name.html"
+  "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
+    --print-to-pdf="past-papers/by-topic/$name.pdf" "file://$T/$name.html" 2>/dev/null
+  rm -rf "$T"
+done
+echo "Built cheatsheet/big-data-cheatsheet.pdf past-papers/past-papers-and-answers.pdf and past-papers/by-topic/*.pdf"

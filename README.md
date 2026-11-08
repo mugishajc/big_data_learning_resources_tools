@@ -32,6 +32,7 @@ answers/                       Answers in Markdown, readable on GitHub
 past-papers/
   past-papers-and-answers.pdf  Everything in answers/ as one printable PDF
   day3-assignment-answers.pdf  Day 3 assignment answer sheet
+  by-topic/                    The same answers, one PDF per day (print only what you need)
 cheatsheet/
   big-data-cheatsheet.pdf      3-page summary of Days 1 to 4
   cheatsheet.html              Source of the PDF
