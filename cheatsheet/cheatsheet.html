@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Big Data Analytics Cheat Sheet</title>
+<style>
+  @page { size: A4; margin: 11mm 10mm 12mm 10mm; }
+  * { box-sizing: border-box; }
+  body { font: 8.6pt/1.32 "Helvetica Neue", Arial, sans-serif; color: #111; margin: 0; }
+  header { display: flex; justify-content: space-between; align-items: baseline;
+           border-bottom: 2px solid #1f3a8a; padding-bottom: 3px; margin-bottom: 6px; }
+  header h1 { font-size: 14pt; margin: 0; color: #1f3a8a; }
+  header span { font-size: 8pt; color: #555; }
+  .cols { column-count: 2; column-gap: 7mm; }
+  section { margin-bottom: 6px; }
+  table, pre, .trap, li { break-inside: avoid; }
+  h2 { font-size: 9.6pt; background: #1f3a8a; color: #fff; padding: 2px 5px; margin: 0 0 3px; break-after: avoid; }
+  h3 { break-after: avoid; }
+  h3 { font-size: 8.8pt; margin: 4px 0 1px; color: #1f3a8a; }
+  p { margin: 1px 0 3px; }
+  ul { margin: 1px 0 3px; padding-left: 13px; }
+  li { margin: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 2px 0 4px; font-size: 8pt; }
+  th, td { border: 1px solid #c9cfdc; padding: 1px 3px; text-align: left; vertical-align: top; }
+  th { background: #e8ecf6; }
+  code { font: 7.9pt Menlo, Consolas, monospace; background: #f1f3f8; padding: 0 2px; }
+  pre { font: 7.6pt/1.25 Menlo, Consolas, monospace; background: #f1f3f8; padding: 3px 4px; margin: 2px 0 4px; white-space: pre-wrap; }
+  .trap { border-left: 3px solid #b91c1c; padding-left: 4px; margin: 3px 0; }
+  .trap b { color: #b91c1c; }
+  footer { margin-top: 4px; font-size: 7.5pt; color: #666; border-top: 1px solid #ccc; padding-top: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Big Data Analytics: Exam and CAT Cheat Sheet</h1>
+  <span>MIT 91205 &middot; Days 1 to 4 &middot; Hadoop, Hive, Pig, Spark</span>
+</header>
+
+<div class="cols">
+
+<section>
+<h2>1. Big Data basics</h2>
+<p><b>Big Data</b>: data too big, too fast or too varied for one machine or a normal database to handle in acceptable time and cost.</p>
+<table>
+<tr><th>V</th><th>Meaning</th><th>Example</th></tr>
+<tr><td>Volume</td><td>size (TB to PB)</td><td>years of bank transactions</td></tr>
+<tr><td>Velocity</td><td>speed of arrival</td><td>mobile money events per second</td></tr>
+<tr><td>Variety</td><td>structured, semi, unstructured</td><td>tables, JSON, images</td></tr>
+<tr><td>Veracity</td><td>quality, trust</td><td>missing or duplicate records</td></tr>
+<tr><td>Value</td><td>useful insight</td><td>fraud caught, cost saved</td></tr>
+</table>
+<p><b>Analytics types</b>: descriptive (what happened), diagnostic (why), predictive (what will happen), prescriptive (what to do). Value and difficulty grow in that order.</p>
+<p><b>Lifecycle</b>: business understanding, acquisition, preparation (60 to 80% of effort), analysis, visualization, action and feedback. It loops.</p>
+<p><b>Data types</b>: structured (fixed schema), semi-structured (JSON, XML, logs), unstructured (text, audio, video).</p>
+</section>
+
+<section>
+<h2>2. Distributed systems</h2>
+<ul>
+<li><b>Scale up</b> (vertical): bigger machine, simple, hits a ceiling. <b>Scale out</b> (horizontal): more machines, cheap, needs coordination. Big Data scales out.</li>
+<li><b>Characteristics</b>: resource sharing, concurrency, transparency, scalability, fault tolerance, heterogeneity.</li>
+<li><b>Architectures</b>: client-server, peer-to-peer, master-worker (Hadoop, Spark).</li>
+</ul>
+<h3>CAP: during a network partition choose C or A</h3>
+<table>
+<tr><th>Type</th><th>Behaviour</th><th>Examples</th></tr>
+<tr><td>CP</td><td>refuse some requests, never stale</td><td>HBase, MongoDB (majority)</td></tr>
+<tr><td>AP</td><td>always answer, may be stale</td><td>Cassandra, DynamoDB</td></tr>
+<tr><td>CA</td><td>only without partitions</td><td>single-node RDBMS</td></tr>
+</table>
+<p><b>PACELC</b>: if Partition, A or C; Else, Latency or Consistency.</p>
+<table>
+<tr><th>ACID (RDBMS)</th><th>BASE (many NoSQL)</th></tr>
+<tr><td>Atomic, Consistent, Isolated, Durable</td><td>Basically Available, Soft state, Eventual consistency</td></tr>
+<tr><td>bank transfer</td><td>likes counter, social feed</td></tr>
+</table>
+<p><b>Partitioning</b>: range (good for range queries), hash (even load), list, round-robin. Risk: skew and hot spots.</p>
+<p><b>Replication</b>: master-slave, multi-master, quorum (W + R &gt; N gives strong reads).</p>
+<p><b>Failures</b>: crash, omission, timing, Byzantine. Tools: replication, checkpointing, heartbeats, retries, speculative execution.</p>
+<p><b>Processing</b>: batch (bounded, throughput), stream (unbounded, latency), interactive (ad hoc queries).</p>
+<p><b>Lambda</b> = batch layer + speed layer + serving layer (two code paths). <b>Kappa</b> = one streaming path, replay the log to reprocess.</p>
+<p><b>Layers</b>: sources, ingestion, storage, processing, analytics, visualization; governance and security cut across all.</p>
+</section>
+
+<section>
+<h2>3. HDFS</h2>
+<table>
+<tr><th>NameNode (master)</th><th>DataNode (worker)</th></tr>
+<tr><td>namespace, file to block to node map, in RAM; gets heartbeats and block reports; schedules re-replication</td><td>stores blocks on local disk, checksums, heartbeat every 3 s, serves reads and writes</td></tr>
+</table>
+<ul>
+<li>Block 128 MB (often 256 MB), replication 3. Rack-aware: replica 1 local, 2 and 3 on one other rack.</li>
+<li><b>Read</b>: ask NameNode for locations, read directly from nearest DataNode. NameNode never carries data.</li>
+<li><b>Write</b>: pipeline client to DN1 to DN2 to DN3, acks flow back.</li>
+<li>DataNode dead after about 10 min of silence; its blocks are copied from other replicas.</li>
+<li><b>HA</b>: active + standby NameNode, shared edits via JournalNodes, ZooKeeper failover. <b>Secondary NameNode is not a backup</b>: it only merges fsimage and edits.</li>
+<li><b>Federation</b>: several NameNodes, each owns part of the namespace.</li>
+<li>Good for: large files, write once read many, sequential scans. Bad for: millions of small files, low-latency random access, in-place edits.</li>
+</ul>
+<pre>blocks = ceil(file size / block size)
+raw    = file size x replication
+1 GB, 128 MB, R=3: 8 blocks, 24 replicas, 3 GB raw</pre>
+</section>
+
+<section>
+<h2>4. YARN</h2>
+<table>
+<tr><th>Part</th><th>Job</th></tr>
+<tr><td>ResourceManager</td><td>cluster-wide scheduler (FIFO, Capacity, Fair), starts each AM</td></tr>
+<tr><td>NodeManager</td><td>one per node, launches containers, reports health</td></tr>
+<tr><td>ApplicationMaster</td><td>one per app, asks RM for containers, runs and retries tasks</td></tr>
+<tr><td>Container</td><td>bundle of memory + vCores on one node</td></tr>
+</table>
+<p>HDFS manages <b>storage</b>; YARN manages <b>CPU and memory</b>. YARN lets MapReduce, Spark and Tez share one cluster.</p>
+</section>
+
+<section>
+<h2>5. MapReduce</h2>
+<pre>input split -> map -> (combine) -> partition -> shuffle &amp; sort -> reduce -> HDFS
+map:    (k1, v1)       -> list(k2, v2)
+reduce: (k2, list(v2)) -> list(k3, v3)</pre>
+<ul>
+<li>Split = logical unit of work (usually one block). One map task per split.</li>
+<li>Map output goes to <b>local disk</b>, not HDFS. Final output goes to HDFS, one <code>part-</code> file per reducer.</li>
+<li><b>Partitioner</b>: <code>hash(key) mod R</code> picks the reducer. <b>Combiner</b>: local mini-reduce, may run 0, 1 or many times, only for associative and commutative ops.</li>
+<li><b>Shuffle</b> is the most expensive phase: disk, network, sort.</li>
+<li>Data locality: run the map where the block is (node-local, then rack-local, then off-rack).</li>
+<li>Stragglers: speculative execution runs a copy; first to finish wins. Does not fix skew.</li>
+<li>Weak for: iterative jobs (each loop = new job + disk I/O), interactive queries.</li>
+</ul>
+<h3>Patterns</h3>
+<table>
+<tr><th>Pattern</th><th>Map emits</th><th>Reduce does</th></tr>
+<tr><td>Word count</td><td>(word, 1)</td><td>sum</td></tr>
+<tr><td>Inverted index</td><td>(word, docId)</td><td>dedupe list</td></tr>
+<tr><td>Average</td><td>(key, (sum, count))</td><td>add, divide once</td></tr>
+<tr><td>Reduce-side join</td><td>(key, tagged record)</td><td>match tags</td></tr>
+<tr><td>Map-side join</td><td>small table in memory, no shuffle</td><td>none</td></tr>
+</table>
+<div class="trap"><b>Trap:</b> average is not a safe combiner (average of averages is wrong). Send (sum, count).</div>
+<p>Amdahl: <code>S(N) = 1 / ((1 - p) + p / N)</code>. The serial part caps the speedup.</p>
+</section>
+
+<section>
+<h2>6. Hive</h2>
+<ul>
+<li>SQL layer (HiveQL) over files in HDFS. Not a database, not an engine: runs on MapReduce, Tez or Spark.</li>
+<li><b>Schema-on-read</b>: schema applied at query time, files untouched. Fast loading, errors show up late (as NULLs).</li>
+<li><b>Metastore</b>: tables, columns, types, locations, partitions, SerDe. Backed by MySQL or PostgreSQL (Derby for tests only).</li>
+<li>Flow: client, HiveServer2, driver (parse, analyze, optimize, plan), engine, HDFS.</li>
+</ul>
+<table>
+<tr><th></th><th>Managed</th><th>External</th></tr>
+<tr><td>Files owned by</td><td>Hive</td><td>someone else</td></tr>
+<tr><td>DROP TABLE</td><td>deletes data + metadata</td><td>deletes metadata only</td></tr>
+</table>
+<table>
+<tr><th></th><th>Partitioning</th><th>Bucketing</th></tr>
+<tr><td>Split by</td><td>column value, one folder each</td><td>hash(col) mod N files</td></tr>
+<tr><td>Gives</td><td>partition pruning</td><td>sampling, bucket joins</td></tr>
+<tr><td>Risk</td><td>too many tiny partitions</td><td>fixed count chosen early</td></tr>
+</table>
+<pre>CREATE TABLE sales (id BIGINT, amount DOUBLE)
+PARTITIONED BY (dt STRING) STORED AS PARQUET;
+SELECT region, SUM(amount) FROM sales
+WHERE dt = '2024-03-15' GROUP BY region;  -- one folder read</pre>
+<p><b>Formats</b>: text/CSV/JSON (easy, slow), Avro (row, schema evolution, pipelines), Parquet and ORC (columnar, compression, pushdown, analytics).</p>
+<p><b>SerDe</b> = serializer/deserializer: turns bytes into rows using the table schema.</p>
+<p><b>UDF</b> 1 row to 1 value, <b>UDAF</b> many rows to 1 value, <b>UDTF</b> 1 row to many rows (<code>explode</code>).</p>
+<p>Order of evaluation: FROM, WHERE, GROUP BY, HAVING, SELECT, ORDER BY, LIMIT. WHERE filters rows, HAVING filters groups.</p>
+<div class="trap"><b>Trap:</b> <code>col = NULL</code> is never true. Use <code>IS NULL</code>. <code>COUNT(*)</code> counts rows, <code>COUNT(col)</code> skips NULLs.</div>
+<div class="trap"><b>Trap:</b> a function on the partition column (<code>year(dt) = 2024</code>) can stop pruning.</div>
+</section>
+
+<section>
+<h2>7. Pig</h2>
+<ul>
+<li>Pig Latin: procedural <b>dataflow</b> scripts, each line names a new relation. Hive is declarative SQL.</li>
+<li>Types: <b>tuple</b> (ordered fields), <b>bag</b> (unordered tuples), <b>map</b> (key#value).</li>
+<li>Modes: local (<code>pig -x local</code>) and cluster. Nothing runs until <code>DUMP</code> or <code>STORE</code>.</li>
+</ul>
+<pre>s  = LOAD 'sales' USING PigStorage(',') AS (id:int, region:chararray, amount:double);
+g  = GROUP s BY region;
+t  = FOREACH g GENERATE group, SUM(s.amount);
+STORE t INTO 'out';</pre>
+<p>Joins: default (shuffle), <code>'replicated'</code> (small side in memory), <code>'merge'</code> (pre-sorted). Also SPLIT, UNION, ORDER, LIMIT, DESCRIBE, EXPLAIN.</p>
+<table>
+<tr><th>Pick Hive when</th><th>Pick Pig when</th></tr>
+<tr><td>SQL users, reports, shared tables, BI tools</td><td>multi-step ETL, nested data, branching flows</td></tr>
+</table>
+</section>
+
+<section>
+<h2>8. Spark architecture</h2>
+<ul>
+<li>In-memory engine; not storage, not a resource manager. Runs on YARN, Kubernetes, standalone or local.</li>
+<li><b>Driver</b>: runs main(), builds DAG, schedules. Dies = app fails. <b>Executor</b>: runs tasks, caches data. Dies = tasks rerun elsewhere.</li>
+<li>Client mode: driver on your machine (notebooks). Cluster mode: driver inside the cluster (production).</li>
+<li><b>Application</b> &gt; <b>job</b> (one per action) &gt; <b>stage</b> (cut at each shuffle) &gt; <b>task</b> (one per partition).</li>
+<li><b>Lazy</b>: transformations only record the plan; an action runs it.</li>
+<li><b>Lineage</b>: lost partitions are recomputed from their parents, no replication of intermediate data. <code>checkpoint()</code> cuts long lineage.</li>
+</ul>
+<table>
+<tr><th>Narrow (no shuffle)</th><th>Wide (shuffle, new stage)</th></tr>
+<tr><td>map, filter, flatMap, select, withColumn, union, coalesce</td><td>groupByKey, reduceByKey, join, distinct, repartition, orderBy</td></tr>
+</table>
+<table>
+<tr><th>Transformations (lazy)</th><th>Actions (run a job)</th></tr>
+<tr><td>map, filter, join, groupBy</td><td>count, collect, show, take, reduce, save/write</td></tr>
+</table>
+<pre>words.map(lambda w: (w, 1)).reduceByKey(add)  # combines before shuffle
+words.map(lambda w: (w, 1)).groupByKey()      # ships every value: avoid</pre>
+</section>
+
+<section>
+<h2>9. RDD, DataFrame, Dataset, SQL</h2>
+<table>
+<tr><th></th><th>RDD</th><th>DataFrame</th><th>Dataset</th></tr>
+<tr><td>Schema</td><td>no</td><td>yes</td><td>yes</td></tr>
+<tr><td>Optimizer</td><td>none</td><td>Catalyst + Tungsten</td><td>Catalyst + Tungsten</td></tr>
+<tr><td>Languages</td><td>all</td><td>all</td><td>Scala, Java</td></tr>
+<tr><td>Use for</td><td>custom low-level logic</td><td>most work</td><td>typed JVM code</td></tr>
+</table>
+<p>Spark SQL and DataFrames share one engine: same plan, same speed. Default choice: DataFrame or SQL.</p>
+<p><b>Catalyst</b>: parse, analyze (resolve names via catalog), optimize logical plan (pushdown, pruning, constant folding, join reorder), choose physical plan, generate code. <b>Tungsten</b>: binary rows, off-heap memory, whole-stage code generation.</p>
+</section>
+
+<section>
+<h2>10. Performance</h2>
+<ul>
+<li><b>Predicate pushdown</b>: filter at the source; Parquet skips row groups by min/max. <b>Partition pruning</b>: skip whole folders. <b>Projection pruning</b>: read only needed columns (no <code>SELECT *</code>).</li>
+<li><b>Joins</b>: broadcast hash (small side &lt; 10 MB default, no shuffle of big side), sort-merge (two big tables), shuffle hash.</li>
+<li><b>Skew</b>: one task far slower than the rest. Fix: salting, AQE skew join, broadcast, handle hot keys apart.</li>
+<li><code>repartition(n)</code> full shuffle, can grow. <code>coalesce(n)</code> merges, no full shuffle, use before writing.</li>
+<li><code>spark.sql.shuffle.partitions</code> = 200 by default; tune to data size. AQE can coalesce at runtime.</li>
+<li><b>Memory</b>: unified pool for execution (shuffle, join, sort) and storage (cache). Execution can evict cache.</li>
+<li><b>Cache</b> only what is reused; <code>unpersist()</code> after. <code>cache()</code> = MEMORY_ONLY for RDD, MEMORY_AND_DISK for DataFrame.</li>
+<li>Avoid: <code>collect()</code> on big data, Python UDFs (use built-ins), thousands of tiny output files.</li>
+<li>Executors: about 4 to 5 cores each.</li>
+</ul>
+<h3>Reading <code>explain()</code></h3>
+<table>
+<tr><td><code>Exchange</code></td><td>shuffle (stage boundary)</td></tr>
+<tr><td><code>BroadcastHashJoin</code></td><td>small table copied to executors</td></tr>
+<tr><td><code>PushedFilters</code></td><td>filter sent to file reader</td></tr>
+<tr><td><code>PartitionFilters</code></td><td>folders skipped</td></tr>
+<tr><td><code>ReadSchema</code></td><td>columns actually read</td></tr>
+<tr><td><code>InMemoryTableScan</code></td><td>reading the cache</td></tr>
+</table>
+<p><b>Spark UI</b> (port 4040): Jobs, Stages (task time spread shows skew), Storage (cache), SQL (plan graph), Executors.</p>
+</section>
+
+<section>
+<h2>11. MLlib and GraphX</h2>
+<ul>
+<li><b>Transformer</b>: <code>transform()</code> (VectorAssembler, fitted model). <b>Estimator</b>: <code>fit()</code> returns a model (LogisticRegression, KMeans). <b>Pipeline</b>: ordered stages, reused for training and inference.</li>
+<li>Features: StringIndexer, OneHotEncoder, StandardScaler, Imputer, VectorAssembler.</li>
+<li>Algorithms: logistic regression, decision tree, random forest, k-means, ALS (recommendations).</li>
+<li>Metrics: classification (precision, recall, F1, AUC), regression (RMSE, MAE, R<sup>2</sup>), clustering (silhouette).</li>
+<li><code>spark.ml</code> (DataFrames) is current; <code>spark.mllib</code> (RDDs) is maintenance only.</li>
+<li>Small data that fits one machine: scikit-learn is usually faster.</li>
+<li><b>GraphX</b>: vertex RDD + edge RDD. Pregel supersteps: get messages, update, send. PageRank, connected components, triangle counting. GraphFrames for Python.</li>
+</ul>
+</section>
+
+<section>
+<h2>12. Which tool?</h2>
+<table>
+<tr><th>Need</th><th>Use</th></tr>
+<tr><td>store huge files reliably</td><td>HDFS or object store</td></tr>
+<tr><td>one big nightly scan, legacy cluster</td><td>MapReduce or Hive</td></tr>
+<tr><td>SQL reports over a data lake</td><td>Hive or Spark SQL</td></tr>
+<tr><td>multi-step ETL scripts</td><td>Pig or Spark</td></tr>
+<tr><td>iterative ML, graphs</td><td>Spark (MLlib, GraphX)</td></tr>
+<tr><td>sub-second dashboards</td><td>precompute with Spark, serve from DuckDB, ClickHouse, Druid</td></tr>
+<tr><td>real-time events</td><td>Kafka + Structured Streaming (Day 5)</td></tr>
+<tr><td>data fits a laptop</td><td>pandas, DuckDB, scikit-learn</td></tr>
+</table>
+</section>
+
+<section>
+<h2>13. Ten traps examiners like</h2>
+<ol style="margin:1px 0;padding-left:14px">
+<li>NameNode stores metadata, not data.</li>
+<li>Secondary NameNode is not a hot standby.</li>
+<li>Replication does not protect against deletes or bugs.</li>
+<li>Schema-on-read still has a schema.</li>
+<li>Hive is not a database and not always MapReduce.</li>
+<li>Combiner may never run; result must not depend on it.</li>
+<li>Spark spills to disk; it is not "all in memory".</li>
+<li>Spark replaces MapReduce, not HDFS or YARN.</li>
+<li>Caching data used once wastes memory.</li>
+<li>Columnar is best for analytics, not for every workload.</li>
+</ol>
+</section>
+
+</div>
+<footer>Shared for revision. Full answers, labs and resources: github.com/mugishajc/big_data_learning_resources_tools</footer>
+</body>
+</html>
